@@ -1,3 +1,7 @@
+"""
+The EFA code is adapted from the CS 321M Discussion Section 5 Tutorial Notebook.
+"""
+
 import json
 import os
 import numpy as np
