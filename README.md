@@ -122,7 +122,6 @@ Estimates reliability of flagging judgments using Generalizability Theory (G-stu
 | `--scenario` | — | Yes | `product_promotion` or `loan_qa` |
 | `--results_dir` | bundled pilot data | No | Path to results directory with `{model}/{condition}/{subtype}/` layout |
 | `--output_dir` | `results/g-study/{scenario}` | No | Directory to write outputs |
-| `--condition` | `default` | No | Condition subdirectory name |
 | `--target` | `0.85` | No | G-coefficient reliability target for D-study reference line |
 | `--verbose` | `False` | No | Print progress |
 
