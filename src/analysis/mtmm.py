@@ -1,5 +1,6 @@
 """
-The MTMM code is inspired by the CS 321M Discussion Section 5 Tutorial Notebook.
+The MTMM code is inspired by the CS 321M Discussion Section 5 Tutorial Noteboo, and
+AI Measurement Science Chapter 6, Validity (Truong and Koyejo, 2026).
 """
 
 from itertools import combinations
