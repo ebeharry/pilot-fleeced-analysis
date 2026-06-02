@@ -417,8 +417,7 @@ def save_gstudy_results(
     csv_path = os.path.join(output_dir, f"d_study_{scenario}.csv")
     dstudy_df.to_csv(csv_path, index=False)
 
-    print(f"G-study results: {json_path}")
-    print(f"D-study table:   {csv_path}")
+    print(f"Results written to {output_dir}")
 
 
 def _print_dstudy_best(dstudy_df: pd.DataFrame) -> None:
@@ -474,7 +473,8 @@ def run_gstudy(
     observed_n = {"n_judges": dc["n_R"], "n_convs": dc["n_I"], "n_subtypes": dc["n_S"]}
     dstudy_df = run_dstudy(vc, observed_n)
 
-    _print_dstudy_best(dstudy_df)
+    if verbose:
+        _print_dstudy_best(dstudy_df)
 
     save_dstudy_plot(dstudy_df, output_dir, scenario, target=target)
     save_gstudy_results(scenario, gstudy_result, g_coef, phi_coef, dstudy_df, output_dir)
