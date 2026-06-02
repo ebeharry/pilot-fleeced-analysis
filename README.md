@@ -75,7 +75,7 @@ Complete step-by-step instructions to reproduce every result from scratch:
    python -m src efa    --scenario loan_qa           --output_dir reproduction/efa/loan_qa
    ```
 
-4. **Find the outputs** in `results/` — see [Script -> Output Mapping](#script--output-mapping) below for the exact file list.
+4. **Find the outputs** in `reproduction/` — see [Script -> Output Mapping](#script--output-mapping) below for the exact file list.
 
 ## Quick Start
 
