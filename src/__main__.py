@@ -25,19 +25,13 @@ def main():
         "--results_dir",
         type=str,
         default=None,
-        help="Path to trial results directory (contains {model}/{condition}/{subtype}/ subdirs); defaults to bundled pilot data"
+        help="Path to trial results directory (contains {model}/{subtype}/ subdirs); defaults to bundled pilot data"
     )
     gstudy_parser.add_argument(
         "--output_dir",
         type=str,
         default=None,
         help="Directory to write g_study JSON, d_study CSV, and plot; defaults to results/g-study/{scenario}"
-    )
-    gstudy_parser.add_argument(
-        "--condition",
-        type=str,
-        default="default",
-        help="Condition subdirectory to read (default: default)"
     )
     gstudy_parser.add_argument(
         "--target",
@@ -131,7 +125,6 @@ def main():
             results_dir=results_dir,
             scenario=args.scenario,
             output_dir=output_dir,
-            condition=args.condition,
             target=args.target,
             verbose=args.verbose,
         )

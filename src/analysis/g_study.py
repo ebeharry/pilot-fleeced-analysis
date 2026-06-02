@@ -52,39 +52,34 @@ def _extract_conv_flag_rates(flagging_data: dict) -> list[dict]:
         })
     return records
 
-def _scan_flagging_files(results_dir: str, condition: str) -> list[dict]:
+def _scan_flagging_files(results_dir: str) -> list[dict]:
     """
-    Walk results_dir/{model}/{condition}/{sub_scenario}/evaluations/flagging_results.json.
+    Walk results_dir recursively for flagging_results.json files.
 
     :param results_dir: Top-level pilot run directory.
-    :param condition: Condition subdirectory name (e.g. "baseline").
     :return: List of dicts with keys agent_model, sub_scenario, path.
     """
     entries = []
     if not os.path.isdir(results_dir):
         raise ValueError(f"results_dir does not exist: {results_dir}")
-    for model_name in sorted(os.listdir(results_dir)):
-        model_dir = os.path.join(results_dir, model_name)
-        if not os.path.isdir(model_dir):
+    for root, _dirs, files in os.walk(results_dir):
+        if "flagging_results.json" not in files:
             continue
-        condition_dir = os.path.join(model_dir, condition)
-        if not os.path.isdir(condition_dir):
+        rel = os.path.relpath(root, results_dir)
+        parts = rel.split(os.sep)
+        # sub_scenario is the directory immediately above evaluations/
+        if len(parts) < 2 or parts[-1] != "evaluations":
             continue
-        for subtype_name in sorted(os.listdir(condition_dir)):
-            subtype_dir = os.path.join(condition_dir, subtype_name)
-            flagging_path = os.path.join(subtype_dir, "evaluations", "flagging_results.json")
-            if os.path.isfile(flagging_path):
-                entries.append({
-                    "agent_model": model_name,
-                    "sub_scenario": subtype_name,
-                    "path": flagging_path,
-                })
-    return entries
+        entries.append({
+            "agent_model": parts[0],
+            "sub_scenario": parts[-2],
+            "path": os.path.join(root, "flagging_results.json"),
+        })
+    return sorted(entries, key=lambda e: (e["agent_model"], e["sub_scenario"]))
 
 def build_input_matrix(
     results_dir: str,
     scenario: str,
-    condition: str = "baseline",
     verbose: bool = False,
 ) -> pd.DataFrame:
     """
@@ -92,14 +87,13 @@ def build_input_matrix(
 
     :param results_dir: Path to pilot run directory (e.g. "results/pilot_product_promotion_generation").
     :param scenario: Scenario label stored in metadata column only.
-    :param condition: Condition subdirectory to read from.
     :param verbose: If True, print discovery progress.
     :return: DataFrame with columns [agent_model, judge, conv_id, sub_scenario,
              n_claims, n_flagged, flag_rate, logit_dr].
     """
-    file_entries = _scan_flagging_files(results_dir, condition)
+    file_entries = _scan_flagging_files(results_dir)
     if not file_entries:
-        raise ValueError(f"No flagging_results.json files found under {results_dir}/{condition}/")
+        raise ValueError(f"No flagging_results.json files found under {results_dir}/")
 
     rows = []
     for entry in file_entries:
@@ -449,7 +443,6 @@ def run_gstudy(
     results_dir: str,
     scenario: str,
     output_dir: str,
-    condition: str = "baseline",
     target: float = 0.85,
     verbose: bool = False,
 ) -> dict:
@@ -459,7 +452,6 @@ def run_gstudy(
     :param results_dir: Pilot run directory.
     :param scenario: Scenario label.
     :param output_dir: Directory for output files and plots.
-    :param condition: Condition subdirectory.
     :param target: G-coefficient target for D-study reference line.
     :param verbose: If True, print progress and diagnostics.
     :return: Dict with keys matrix, gstudy_result, g_coefficient, dstudy_df.
@@ -467,7 +459,7 @@ def run_gstudy(
     if verbose:
         print(f"\n=== G-Study: {scenario} ===\n")
 
-    df = build_input_matrix(results_dir, scenario, condition=condition, verbose=verbose)
+    df = build_input_matrix(results_dir, scenario, verbose=verbose)
     gstudy_result = fit_gstudy(df, verbose=verbose)
 
     vc = gstudy_result["variance_components"]
